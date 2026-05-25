@@ -9,6 +9,8 @@ import 'package:financial_tracker/ui/widget/transaction_sheets_card.dart';
 import 'package:flutter/material.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
+import 'transaction_screen.dart'
+;
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -19,6 +21,12 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   late HomePageController viewModelController;
   bool _isFilterVisible = false;
+  int _selectedIndex = 0;
+
+  final List<Widget> _pages = <Widget>[
+    const HomeScreen(),
+    const TransactionScreen(),
+  ];
 
   @override
   void initState() {
