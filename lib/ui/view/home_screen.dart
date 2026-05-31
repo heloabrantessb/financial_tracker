@@ -20,12 +20,6 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   late HomePageController viewModelController;
   bool _isFilterVisible = false;
-  int _currentIndex = 0;  
-
-  final List<Widget> _pages = [
-    const HomeScreen(),
-    const TransactionScreen()
-  ];
 
   @override
   void initState() {
@@ -61,13 +55,6 @@ class _HomeScreenState extends State<HomeScreen> {
               onPressed: viewModelController.toggleFilterVisibility,
             );
           }),
-          // IconButton(
-          //   icon: Icon(
-          //     _isFilterVisible ? Icons.filter_list_off : Icons.filter_list,
-          //   ),
-          //   onPressed: _toggleFilterVisibility,
-          //   tooltip: _isFilterVisible ? 'Ocultar Filtros' : 'Mostrar Filtros',
-          // ),
           IconButton(
             icon: const Icon(Icons.receipt_long),
             onPressed: () {},
@@ -128,21 +115,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         : const SizedBox.shrink(), // criar um espaço vazio
               );
             }),
-            // AnimatedContainer(
-            //   duration: const Duration(milliseconds: 300),
-            //   height:
-            //       _isFilterVisible
-            //           ? null
-            //           : 0, // se true altura é automática o conteudo, se false altura é 0
-            //   child:
-            //       _isFilterVisible
-            //           ? DateFilterTransactions(
-            //             currentFilter: DateFilterType.all,
-            //             onFilterChanged: (_, _, type) {},
-            //             onTapHideFilter: _toggleFilterVisibility,
-            //           )
-            //           : const SizedBox.shrink(), // criar um espaço vazio
-            // ),
             Padding(
               padding: const EdgeInsets.all(16),
               child: Row(
@@ -187,59 +159,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 scaffoldContext: context,
               );
             }),
-
-            // TransactionCardSheets(
-            //   incomeTransactions: [
-            //     TransactionEntity(
-            //       title: 'teste',
-            //       amount: 1200.00,
-            //       date: DateTime.now(),
-            //       type: TransactionType.income,
-            //     ),
-            //     TransactionEntity(
-            //       title: 'teste',
-            //       amount: 1200.00,
-            //       date: DateTime.now(),
-            //       type: TransactionType.income,
-            //     ),
-            //     TransactionEntity(
-            //       title: 'teste',
-            //       amount: 1200.00,
-            //       date: DateTime.now(),
-            //       type: TransactionType.income,
-            //     ),
-            //     TransactionEntity(
-            //       title: 'teste',
-            //       amount: 1200.00,
-            //       date: DateTime.now(),
-            //       type: TransactionType.income,
-            //     ),
-            //   ],
-            //   expenseTransactions: [],
-            //   onDelete: (id) {},
-            // ),
             const SizedBox(height: 32),
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (int index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-        items: [
-          BottomNavigationBarItem(
-          icon: Icon(Icons.home),
-          label: 'Home'
-          ),
-          BottomNavigationBarItem(
-          icon: Icon(Icons.list),
-          label: 'Transactions'
-          ),
-        ]
-      )
     );
   }
 
