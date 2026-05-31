@@ -115,35 +115,35 @@ class _HomeScreenState extends State<HomeScreen> {
                         : const SizedBox.shrink(), // criar um espaço vazio
               );
             }),
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                children: [
-                  // Add Income button
-                  Expanded(
-                    child: _buildActionButton(
-                      context,
-                      TransactionType.income,
-                      Icons.add_circle,
-                      colorScheme.primary,
-                      //() {},
-                      () => _showIncomeSheet(context),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  // Add Expense button
-                  Expanded(
-                    child: _buildActionButton(
-                      context,
-                      TransactionType.expense,
-                      Icons.remove_circle,
-                      colorScheme.secondary,
-                      () => _showExpenseSheet(context),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            // Padding(
+            //   padding: const EdgeInsets.all(10),
+            //   child: Row(
+            //     children: [
+            //       // Add Income button
+            //       Expanded(
+            //         child: _buildActionButton(
+            //           context,
+            //           TransactionType.income,
+            //           Icons.add_circle,
+            //           colorScheme.primary,
+            //           //() {},
+            //           () => _showIncomeSheet(context),
+            //         ),
+            //       ),
+            //       const SizedBox(width: 16),
+            //       // Add Expense button
+            //       Expanded(
+            //         child: _buildActionButton(
+            //           context,
+            //           TransactionType.expense,
+            //           Icons.remove_circle,
+            //           colorScheme.secondary,
+            //           () => _showExpenseSheet(context),
+            //         ),
+            //       ),
+            //     ],
+            //   ),
+            // ),
             // Transactions card widget with Income and Expense tabs
             Watch((context) {
               //final transactions = viewModelController.transctions.value;
@@ -167,56 +167,39 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   /// Constrói botões para receitas e despesas
-  Widget _buildActionButton(
-    BuildContext context,
-    TransactionType transactionType,
-    IconData icon,
-    Color color,
-    VoidCallback onPressed,
-  ) {
-    return ElevatedButton.icon(
-      icon: Icon(icon, color: Colors.white),
-      label: Text(transactionType.namePlural),
-      onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: color,
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      ),
-    );
-  }
+ 
 
   /// Show income transaction sheet
-  void _showIncomeSheet(BuildContext context) {
-    //final transactionProvider = Provider.of<TransactionProvider>(context, listen: false);
+  // void _showIncomeSheet(BuildContext context) {
+  //   //final transactionProvider = Provider.of<TransactionProvider>(context, listen: false);
 
-    TransactionSheet.show(
-      context: context,
-      type: TransactionType.income,
-      submitCommand: viewModelController.saveTransaction,
-      // onSubmit: (newTransaction) {
-      //   viewModelController.saveTransaction.execute(newTransaction);
-      // },
-      // onSubmit: (title, amount, date) {
-      //   transactionProvider.addIncome(title, amount, date);
-      // },
-    );
-  }
+  //   TransactionSheet.show(
+  //     context: context,
+  //     type: TransactionType.income,
+  //     submitCommand: viewModelController.saveTransaction,
+  //     // onSubmit: (newTransaction) {
+  //     //   viewModelController.saveTransaction.execute(newTransaction);
+  //     // },
+  //     // onSubmit: (title, amount, date) {
+  //     //   transactionProvider.addIncome(title, amount, date);
+  //     // },
+  //   );
+  // }
 
-  /// Show expense transaction sheet
-  void _showExpenseSheet(BuildContext context) {
-    //final transactionProvider = Provider.of<TransactionProvider>(context, listen: false);
+  // /// Show expense transaction sheet
+  // void _showExpenseSheet(BuildContext context) {
+  //   //final transactionProvider = Provider.of<TransactionProvider>(context, listen: false);
 
-    TransactionSheet.show(
-      context: context,
-      type: TransactionType.expense,
-      submitCommand: viewModelController.saveTransaction,
-      // onSubmit: (newTransaction) {
-      //   viewModelController.saveTransaction.execute(newTransaction);
-      // },
-      // onSubmit: (title, amount, date) {
-      //   transactionProvider.addExpense(title, amount, date);
-      // },
-    );
-  }
+  //   TransactionSheet.show(
+  //     context: context,
+  //     type: TransactionType.expense,
+  //     submitCommand: viewModelController.saveTransaction,
+  //     // onSubmit: (newTransaction) {
+  //     //   viewModelController.saveTransaction.execute(newTransaction);
+  //     // },
+  //     // onSubmit: (title, amount, date) {
+  //     //   transactionProvider.addExpense(title, amount, date);
+  //     // },
+  //   );
+  // }
 }
