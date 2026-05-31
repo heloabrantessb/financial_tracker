@@ -1,11 +1,7 @@
-import 'dart:convert';
 
-import 'package:financial_tracker/domain/entity/transaction_entity.dart';
 
 import 'common/config/dependencies.dart';
 import 'common/theme/app_theme.dart';
-import 'helper/transaction_fake_factory.dart';
-import 'helper/transaction_fake_repository.dart';
 import 'ui/view/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -23,7 +19,7 @@ void main() async {
   // print(jsonList.first); // Veja o conteúdo real
   // final transactions =
   //     jsonList
-  //         .map(
+  //         .map(1
   //           (item) => TransactionEntity.fromMap(item as Map<String, dynamic>),
   //         )
   //         .toList();

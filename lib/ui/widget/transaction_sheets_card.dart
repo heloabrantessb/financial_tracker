@@ -44,8 +44,9 @@ class _TransactionCardSheetsState extends State<TransactionCardSheets>
       vsync: this,
     ); // 2 abas: Receitas e Despesas
     _tabController.addListener(() {
-      if (mounted)
+      if (mounted) {
         setState(() {}); // Atualiza o estado quando troca de aba acontece
+      }
     });
   }
 

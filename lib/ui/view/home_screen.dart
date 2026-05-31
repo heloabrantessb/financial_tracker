@@ -8,9 +8,8 @@ import 'package:financial_tracker/ui/widget/transaction_sheet.dart';
 import 'package:financial_tracker/ui/widget/transaction_sheets_card.dart';
 import 'package:flutter/material.dart';
 import 'package:signals_flutter/signals_flutter.dart';
+import 'transaction_screen.dart';
 
-import 'transaction_screen.dart'
-;
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -21,11 +20,11 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   late HomePageController viewModelController;
   bool _isFilterVisible = false;
-  int _selectedIndex = 0;
+  int _currentIndex = 0;  
 
-  final List<Widget> _pages = <Widget>[
+  final List<Widget> _pages = [
     const HomeScreen(),
-    const TransactionScreen(),
+    const TransactionScreen()
   ];
 
   @override
@@ -223,6 +222,24 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        onTap: (int index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+        items: [
+          BottomNavigationBarItem(
+          icon: Icon(Icons.home),
+          label: 'Home'
+          ),
+          BottomNavigationBarItem(
+          icon: Icon(Icons.list),
+          label: 'Transactions'
+          ),
+        ]
+      )
     );
   }
 

@@ -8,21 +8,14 @@ import '../../common/patterns/result.dart';
 import '../../domain/entity/transaction_entity.dart';
 
 class HomePageController {
-  // HomePageController({required TransactionRepositoryContract repo})
-  // : _repo = repo {
   HomePageController({
     required TransactionFacadeUseCases transactionsUseCases,
-    // required GetAllTransactionsUseCaseImpl getAllTransactions,
-    // required GetTransactionUseCaseImpl getTransaction,
   }) : _transactionsUseCases = transactionsUseCases {
-    //  _getAllTransactions = getAllTransactions,
-    //  _getTransaction = getTransaction,
     load = Command0(_loadTransactions);
     searchTransactionsByDate = Command2(_searchTransactionsByDate);
     saveTransaction = Command1(_saveTransaction);
     undoDelectedTransaction = Command1(_undoDelectedTransaction);
     deleteTransaction = Command1(_deleteTransaction);
-    //loadSample = Command0<void, void>(_resetToSample);
     incomes = Computed(
       () =>
           _transactions.value
@@ -52,10 +45,7 @@ class HomePageController {
     balance = Computed(() => totalIncome.value - totalExpense.value);
   }
 
-  //final TransactionRepositoryContract _repo;
   final TransactionFacadeUseCases _transactionsUseCases;
-  // final GetAllTransactionsUseCaseImpl _getAllTransactions;
-  // final GetTransactionUseCaseImpl _getTransaction;
 
   // commands
   late final Command0<List<TransactionEntity>, Failure> load;
@@ -64,7 +54,6 @@ class HomePageController {
   late final Command1<void, Failure, String> deleteTransaction;
   late final Command2<List<TransactionEntity>, Failure, DateTime, DateTime>
   searchTransactionsByDate;
-  //late final Command0<void, void> loadSample;
 
   // signals
   final Signal<List<TransactionEntity>> _transactions = Signal([]);
