@@ -18,6 +18,7 @@ class TransactionCardSheets extends StatefulWidget {
   undoDelete; // Callback para desfazer exclusão
   final BuildContext
   scaffoldContext; // Contexto do Scaffold para exibir SnackBars
+  final bool isExpanded; // Se deve expandir para ocupar a altura restante
 
   const TransactionCardSheets({
     super.key,
@@ -26,6 +27,7 @@ class TransactionCardSheets extends StatefulWidget {
     required this.onDelete,
     required this.undoDelete,
     required this.scaffoldContext,
+    this.isExpanded = false,
   });
 
   @override
@@ -61,6 +63,45 @@ class _TransactionCardSheetsState extends State<TransactionCardSheets>
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
+    Widget tabBarViewContent = TabBarView(
+      controller: _tabController,
+      children: [
+        _buildTransactionList(
+          context,
+          widget.incomeTransactions, // Lista de receitas
+          colorScheme.primary,
+          TransactionType.income.namePlural,
+        ),
+        _buildTransactionList(
+          context,
+          widget.expenseTransactions, // Lista de despesas
+          colorScheme.secondary,
+          TransactionType.expense.namePlural,
+        ),
+      ],
+    );
+
+    Widget bottomContent = widget.isExpanded
+        ? Expanded(
+            child: ClipRRect(
+              borderRadius: const BorderRadius.only(
+                bottomLeft: Radius.circular(20),
+                bottomRight: Radius.circular(20),
+              ),
+              child: tabBarViewContent,
+            ),
+          )
+        : ClipRRect(
+            borderRadius: const BorderRadius.only(
+              bottomLeft: Radius.circular(20),
+              bottomRight: Radius.circular(20),
+            ), // Arredonda bordas inferiores para combinar com o card
+            child: SizedBox(
+              height: 290, // Altura fixa do conteúdo da aba
+              child: tabBarViewContent,
+            ),
+          );
+
     return Card(
       elevation: 8, // Elevação do card para sombra
       margin: const EdgeInsets.all(12), // Margem externa do card
@@ -68,75 +109,47 @@ class _TransactionCardSheetsState extends State<TransactionCardSheets>
         borderRadius: BorderRadius.circular(20),
       ), // Bordas arredondadas
       child: Column(
+        mainAxisSize: widget.isExpanded ? MainAxisSize.max : MainAxisSize.min,
         children: [
-          Column(
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  color: colorScheme.tertiary.withValues(
-                    alpha: 0.15,
-                  ), // Fundo com transparência
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(20),
-                    topRight: Radius.circular(20),
-                  ), // Apenas bordas superiores arredondadas
+          Container(
+            decoration: BoxDecoration(
+              color: colorScheme.tertiary.withValues(
+                alpha: 0.15,
+              ), // Fundo com transparência
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
+              ), // Apenas bordas superiores arredondadas
+            ),
+            child: TabBar(
+              controller: _tabController, // Controlador das abas
+              tabs: [
+                _buildTab(
+                  TransactionType.income.namePlural, // Título da aba
+                  Icons.arrow_upward, // Ícone da aba
+                  0, // Índice da aba
+                  colorScheme.primary, // Cor ativa
+                  colorScheme.primary.withValues(alpha: 0.5), // Cor inativa
                 ),
-                child: TabBar(
-                  controller: _tabController, // Controlador das abas
-                  tabs: [
-                    _buildTab(
-                      TransactionType.income.namePlural, // Título da aba
-                      Icons.arrow_upward, // Ícone da aba
-                      0, // Índice da aba
-                      colorScheme.primary, // Cor ativa
-                      colorScheme.primary.withValues(alpha: 0.5), // Cor inativa
-                    ),
-                    _buildTab(
-                      TransactionType.expense.namePlural,
-                      Icons.arrow_downward,
-                      1,
-                      colorScheme.secondary,
-                      colorScheme.secondary.withValues(alpha: 0.5),
-                    ),
-                  ],
-                  indicatorColor:
-                      _tabController.index ==
-                              0 // Cor do indicador da aba selecionada
-                          ? colorScheme.primary
-                          : colorScheme.secondary,
-                  indicatorSize:
-                      TabBarIndicatorSize
-                          .label, // Indicador do tamanho do label
+                _buildTab(
+                  TransactionType.expense.namePlural,
+                  Icons.arrow_downward,
+                  1,
+                  colorScheme.secondary,
+                  colorScheme.secondary.withValues(alpha: 0.5),
                 ),
-              ),
-              ClipRRect(
-                borderRadius: const BorderRadius.only(
-                  bottomLeft: Radius.circular(20),
-                  bottomRight: Radius.circular(20),
-                ), // Arredonda bordas inferiores para combinar com o card
-                child: SizedBox(
-                  height: 290, // Altura fixa do conteúdo da aba
-                  child: TabBarView(
-                    controller: _tabController,
-                    children: [
-                      _buildTransactionList(
-                        context,
-                        widget.incomeTransactions, // Lista de receitas
-                        colorScheme.primary,
-                        TransactionType.income.namePlural,
-                      ),
-                      _buildTransactionList(
-                        context,
-                        widget.expenseTransactions, // Lista de despesas
-                        colorScheme.secondary,
-                        TransactionType.expense.namePlural,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
+              ],
+              indicatorColor:
+                  _tabController.index ==
+                          0 // Cor do indicador da aba selecionada
+                      ? colorScheme.primary
+                      : colorScheme.secondary,
+              indicatorSize:
+                  TabBarIndicatorSize
+                      .label, // Indicador do tamanho do label
+            ),
           ),
+          bottomContent,
         ],
       ),
     );

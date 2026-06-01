@@ -165,41 +165,4 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-
-  /// Constrói botões para receitas e despesas
- 
-
-  /// Show income transaction sheet
-  // void _showIncomeSheet(BuildContext context) {
-  //   //final transactionProvider = Provider.of<TransactionProvider>(context, listen: false);
-
-  //   TransactionSheet.show(
-  //     context: context,
-  //     type: TransactionType.income,
-  //     submitCommand: viewModelController.saveTransaction,
-  //     // onSubmit: (newTransaction) {
-  //     //   viewModelController.saveTransaction.execute(newTransaction);
-  //     // },
-  //     // onSubmit: (title, amount, date) {
-  //     //   transactionProvider.addIncome(title, amount, date);
-  //     // },
-  //   );
-  // }
-
-  // /// Show expense transaction sheet
-  // void _showExpenseSheet(BuildContext context) {
-  //   //final transactionProvider = Provider.of<TransactionProvider>(context, listen: false);
-
-  //   TransactionSheet.show(
-  //     context: context,
-  //     type: TransactionType.expense,
-  //     submitCommand: viewModelController.saveTransaction,
-  //     // onSubmit: (newTransaction) {
-  //     //   viewModelController.saveTransaction.execute(newTransaction);
-  //     // },
-  //     // onSubmit: (title, amount, date) {
-  //     //   transactionProvider.addExpense(title, amount, date);
-  //     // },
-  //   );
-  // }
 }
