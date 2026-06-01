@@ -14,6 +14,8 @@ class TransactionCardSheets extends StatefulWidget {
   expenseTransactions; // Lista de transações de despesas
   final Function(String id)?
   onDelete; // Callback para deletar uma transação pelo ID
+  final Function(TransactionEntity transaction)?
+  onEdit; // Callback para editar uma transação
 
   final Command1<void, Failure, TransactionEntity>?
   undoDelete; // Callback para desfazer exclusão 
@@ -27,6 +29,7 @@ class TransactionCardSheets extends StatefulWidget {
     required this.expenseTransactions,
     this.onDelete,
     this.undoDelete,
+    this.onEdit,
     required this.scaffoldContext,
     this.isExpanded = false,
   });
@@ -260,8 +263,12 @@ class _TransactionCardSheetsState extends State<TransactionCardSheets>
               ), // Espaçamento interno do item
               leading: CircleAvatar(
                 radius: 22,
+                backgroundColor: color.withValues(
+                  alpha: 0.2,
+                ), // Fundo translúcido (azul para receitas, vermelho para despesas)
                 child: Icon(
                   transaction.category.icon, 
+                  color: color, // Ícone da categoria com a cor temática correspondente
                 ),
               ),
               title: Text(
@@ -273,9 +280,9 @@ class _TransactionCardSheetsState extends State<TransactionCardSheets>
                 style: Theme.of(context).textTheme.bodySmall,
               ),
               trailing: Text(
-                Formatter.formatCurrency(
-                  transaction.amount,
-                ), // Valor formatado em moeda
+                transaction.type == TransactionType.expense
+                    ? '- ${Formatter.formatCurrency(transaction.amount)}'
+                    : Formatter.formatCurrency(transaction.amount), // Adiciona o sinal de subtração nas despesas
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: color, // Cor do texto conforme tipo
@@ -291,10 +298,24 @@ class _TransactionCardSheetsState extends State<TransactionCardSheets>
 
           return Dismissible(
             key: Key(transaction.id), // Chave única para controle do widget
-            direction:
-                DismissDirection
-                    .endToStart, // Permite deslizar da direita para esquerda
+            direction: widget.onEdit != null
+                ? DismissDirection.horizontal
+                : DismissDirection.endToStart, // Permite deslizar para ambos os lados se onEdit fornecido
             background: Container(
+              alignment: Alignment.centerLeft, // Ícone aparece alinhado à esquerda
+              padding: const EdgeInsets.only(
+                left: 20.0,
+              ), // Espaçamento interno
+              decoration: BoxDecoration(
+                color: Colors.blue, // Fundo azul para edição
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(
+                Icons.edit,
+                color: Colors.white,
+              ), // Ícone de edição
+            ),
+            secondaryBackground: Container(
               alignment:
                   Alignment.centerRight, // Ícone aparece alinhado à direita
               padding: const EdgeInsets.only(
@@ -309,6 +330,13 @@ class _TransactionCardSheetsState extends State<TransactionCardSheets>
                 color: Colors.white,
               ), // Ícone de exclusão
             ),
+            confirmDismiss: (direction) async {
+              if (direction == DismissDirection.startToEnd) {
+                widget.onEdit?.call(transaction);
+                return false; // Desliza o item de volta suavemente
+              }
+              return true; // Confirma a exclusão
+            },
             onDismissed: (direction) async {
               
               await widget.onDelete!(

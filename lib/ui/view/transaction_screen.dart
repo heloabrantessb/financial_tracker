@@ -51,6 +51,9 @@ class _TransactionScreenState extends State<TransactionScreen> {
                   viewModelController.deleteTransaction.execute(id);
                 },
                 undoDelete: viewModelController.undoDelectedTransaction,
+                onEdit: (transaction) {
+                  _showEditSheet(context, transaction);
+                },
                 scaffoldContext: context,
               );
             }),
@@ -222,6 +225,16 @@ class _TransactionScreenState extends State<TransactionScreen> {
       context: context,
       type: TransactionType.expense,
       submitCommand: viewModelController.saveTransaction,
+    );
+  }
+
+  /// Exibe a folha (sheet) para editar uma transação existente
+  void _showEditSheet(BuildContext context, TransactionEntity transaction) {
+    TransactionSheet.show(
+      context: context,
+      type: transaction.type,
+      submitCommand: viewModelController.saveTransaction,
+      transaction: transaction,
     );
   }
 }

@@ -6,14 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
-/// Um widget reutilizável de formulário para adicionar transações de receita ou despesa
 class TransactionForm extends StatefulWidget {
   /// Comando que deve ser observado o estado de execução
   /// e o resultado da execução
   final Command1<void, Failure, TransactionEntity> submitCommand;
-
-  /// Função de callback quando o formulário é enviado
-  //final Function(TransactionEntity newTransaction) onSubmit;
 
   /// Tipo de transação (receita ou despesa)
   final TransactionType type;
@@ -21,12 +17,15 @@ class TransactionForm extends StatefulWidget {
   /// Cor do tema para o formulário
   final Color color;
 
+  /// Transação existente a ser editada ()
+  final TransactionEntity? transaction;
+
   const TransactionForm({
     super.key,
-    //required this.onSubmit,
     required this.type,
     required this.color,
     required this.submitCommand,
+    this.transaction,
   });
 
   @override
@@ -43,10 +42,18 @@ class _TransactionFormState extends State<TransactionForm> {
   @override
   void initState() {
     super.initState();
-    // Define a categoria padrão inicial dependendo se é receita ou despesa
-    _selectedCategory = widget.type == TransactionType.income
-        ? TransactionCategory.salary
-        : TransactionCategory.food;
+    // Se houver uma transação para edição, pré-preenche os dados
+    if (widget.transaction != null) {
+      _titleController.text = widget.transaction!.title;
+      _amountController.text = widget.transaction!.amount.toString();
+      _selectedDate = widget.transaction!.date;
+      _selectedCategory = widget.transaction!.category;
+    } else {
+      // Define a categoria padrão inicial para novas transações
+      _selectedCategory = widget.type == TransactionType.income
+          ? TransactionCategory.salary
+          : TransactionCategory.food;
+    }
   }
 
   @override
@@ -77,8 +84,10 @@ class _TransactionFormState extends State<TransactionForm> {
     if (_formKey.currentState!.validate()) {
       final enteredTitle = _titleController.text;
       final enteredAmount = double.parse(_amountController.text);
+      final isEditing = widget.transaction != null;
 
       final newTransaction = TransactionEntity(
+        id: widget.transaction?.id,
         title: enteredTitle,
         amount: enteredAmount,
         date: _selectedDate,
@@ -91,10 +100,11 @@ class _TransactionFormState extends State<TransactionForm> {
 
       if (widget.submitCommand.resultSignal.value?.isFailure ?? false) {
         // Se o comando falhar, exibe uma mensagem de erro
+        final actionText = isEditing ? 'editar' : 'adicionar';
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'Erro ao adicionar ${widget.type.nameSingular}: ${widget.submitCommand.resultSignal.value?.failureValueOrNull ?? 'Erro desconhecido'}',
+              'Erro ao $actionText ${widget.type.nameSingular}: ${widget.submitCommand.resultSignal.value?.failureValueOrNull ?? 'Erro desconhecido'}',
             ),
             backgroundColor: Colors.red,
             duration: const Duration(seconds: 2),
@@ -112,9 +122,12 @@ class _TransactionFormState extends State<TransactionForm> {
       });
 
       // Mostra uma mensagem de sucesso
+      final successText = isEditing
+          ? '${widget.type.nameSingular} Alterada com Sucesso!'
+          : '${widget.type.nameSingular} Adicionada com Sucesso!';
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('${widget.type.nameSingular} Adicionada com Sucesso!'),
+          content: Text(successText),
           backgroundColor: widget.color,
           duration: const Duration(seconds: 2),
         ),
@@ -266,9 +279,11 @@ class _TransactionFormState extends State<TransactionForm> {
                             ),
                           )
                           : Text(
-                            'Adicionar ${widget.type.nameSingular}',
-                            style: const TextStyle(fontSize: 16),
-                          ),
+                              widget.transaction != null
+                                  ? 'Salvar Alterações'
+                                  : 'Adicionar ${widget.type.nameSingular}',
+                              style: const TextStyle(fontSize: 16),
+                            ),
                 ),
               );
             }),

@@ -132,7 +132,14 @@ class HomePageController {
     ));
 
     if (result.isSuccess) {
-      _transactions.value = [..._transactions.value, transaction];
+      final index = _transactions.value.indexWhere((e) => e.id == transaction.id);
+      if (index != -1) {
+        final list = [..._transactions.value];
+        list[index] = transaction;
+        _transactions.value = list; // Atualiza a transação existente reativamente
+      } else {
+        _transactions.value = [..._transactions.value, transaction]; // Adiciona uma nova transação
+      }
     }
 
     return result;

@@ -53,11 +53,13 @@ class TransactionFakeRepository {
           : throw InvalidData(MessagesError.recordInvalidFormat);
     }
 
-    if (transactionJson.isEmpty) {
-      throw InvalidData(MessagesError.recordInvalidFormat);
+    final newTransaction = TransactionEntity.fromMap(jsonDecode(transactionJson));
+    final index = transactions.indexWhere((element) => element.id == newTransaction.id);
+    if (index != -1) {
+      transactions[index] = newTransaction; 
+    } else {
+      transactions.add(newTransaction); 
     }
-
-    transactions.add(TransactionEntity.fromMap(jsonDecode(transactionJson)));
   }
 
   Future<String> getDataByDateRange(
