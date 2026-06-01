@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:uuid/uuid.dart';
+import 'transaction_category.dart';
 
 enum TransactionType { income, expense }
 
@@ -29,6 +30,7 @@ class TransactionEntity {
   final double amount;
   final DateTime date;
   final TransactionType type;
+  final TransactionCategory category;
 
   // Instância estática do Uuid para usar generate()
   static final Uuid _uuid = Uuid();
@@ -39,7 +41,9 @@ class TransactionEntity {
     required this.amount,
     required this.date,
     required this.type,
-  }) : id = id ?? _uuid.v4();
+    TransactionCategory? category,
+  }) : id = id ?? _uuid.v4(),
+       category = category ?? TransactionCategory.other;
 
   TransactionEntity copyWith({
     String? id,
@@ -47,6 +51,7 @@ class TransactionEntity {
     double? amount,
     DateTime? date,
     TransactionType? type,
+    TransactionCategory? category,
   }) {
     return TransactionEntity(
       id: id ?? this.id,
@@ -54,6 +59,7 @@ class TransactionEntity {
       amount: amount ?? this.amount,
       date: date ?? this.date,
       type: type ?? this.type,
+      category: category ?? this.category,
     );
   }
 
@@ -64,6 +70,7 @@ class TransactionEntity {
       'amount': amount,
       'date': date.toUtc().toIso8601String(),
       'type': type.name,
+      'category': category.name,
     };
   }
 
@@ -79,6 +86,12 @@ class TransactionEntity {
         (e) => e.name == map['type'],
         orElse: () => TransactionType.expense,
       ),
+      category: map['category'] != null
+          ? TransactionCategory.values.firstWhere(
+              (e) => e.name == map['category'],
+              orElse: () => TransactionCategory.other,
+            )
+          : TransactionCategory.other,
     );
   }
 
@@ -88,6 +101,7 @@ class TransactionEntity {
       amount: 30.0,
       date: DateTime.now(),
       type: TransactionType.expense,
+      category: TransactionCategory.food,
     );
   }
 
@@ -97,6 +111,7 @@ class TransactionEntity {
       amount: 2500.0,
       date: DateTime.now(),
       type: TransactionType.income,
+      category: TransactionCategory.salary,
     );
   }
 
@@ -109,7 +124,8 @@ class TransactionEntity {
       other.title == title &&
       other.amount == amount &&
       other.date == date &&
-      other.type == type;
+      other.type == type &&
+      other.category == category;
   }
 
   @override
@@ -118,6 +134,7 @@ class TransactionEntity {
       title.hashCode ^
       amount.hashCode ^
       date.hashCode ^
-      type.hashCode;
+      type.hashCode ^
+      category.hashCode;
   }
 }

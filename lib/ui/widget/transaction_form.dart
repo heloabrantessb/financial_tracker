@@ -1,5 +1,6 @@
 import 'package:financial_tracker/common/errors/errors_classes.dart';
 import 'package:financial_tracker/common/patterns/command.dart';
+import 'package:financial_tracker/domain/entity/transaction_category.dart';
 import 'package:financial_tracker/domain/entity/transaction_entity.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -37,6 +38,16 @@ class _TransactionFormState extends State<TransactionForm> {
   final _titleController = TextEditingController();
   final _amountController = TextEditingController();
   DateTime _selectedDate = DateTime.now();
+  late TransactionCategory _selectedCategory; // Categoria atualmente selecionada
+
+  @override
+  void initState() {
+    super.initState();
+    // Define a categoria padrão inicial dependendo se é receita ou despesa
+    _selectedCategory = widget.type == TransactionType.income
+        ? TransactionCategory.salary
+        : TransactionCategory.food;
+  }
 
   @override
   void dispose() {
@@ -72,6 +83,7 @@ class _TransactionFormState extends State<TransactionForm> {
         amount: enteredAmount,
         date: _selectedDate,
         type: widget.type,
+        category: _selectedCategory,
       );
 
       //widget.onSubmit(newTransaction);
@@ -163,6 +175,43 @@ class _TransactionFormState extends State<TransactionForm> {
                   return 'O valor deve ser maior que zero';
                 }
                 return null;
+              },
+            ),
+            const SizedBox(height: 16),
+
+            // Campo de seleção de categoria (Dropdown)
+            DropdownButtonFormField<TransactionCategory>(
+              value: _selectedCategory,
+              decoration: InputDecoration(
+                labelText: 'Categoria',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                prefixIcon: Icon(
+                  _selectedCategory.icon,
+                  color: widget.color,
+                ),
+              ),
+              items: TransactionCategory.values
+                  .where((c) => c.isValidFor(widget.type))
+                  .map((category) {
+                return DropdownMenuItem<TransactionCategory>(
+                  value: category,
+                  child: Row(
+                    children: [
+                      Icon(category.icon),
+                      const SizedBox(width: 10),
+                      Text(category.displayName),
+                    ],
+                  ),
+                );
+              }).toList(),
+              onChanged: (TransactionCategory? newValue) {
+                if (newValue != null) {
+                  setState(() {
+                    _selectedCategory = newValue;
+                  });
+                }
               },
             ),
             const SizedBox(height: 16),

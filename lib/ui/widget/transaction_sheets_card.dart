@@ -2,6 +2,7 @@ import 'package:financial_tracker/common/errors/errors_classes.dart';
 import 'package:financial_tracker/common/patterns/command.dart';
 
 import '../../common/utils/formatter.dart';
+import '../../domain/entity/transaction_category.dart';
 import '../../domain/entity/transaction_entity.dart';
 import 'package:flutter/material.dart';
 
@@ -11,11 +12,11 @@ class TransactionCardSheets extends StatefulWidget {
   incomeTransactions; // Lista de transações de receitas
   final List<TransactionEntity>
   expenseTransactions; // Lista de transações de despesas
-  final Function(String id)
+  final Function(String id)?
   onDelete; // Callback para deletar uma transação pelo ID
 
-  final Command1<void, Failure, TransactionEntity>
-  undoDelete; // Callback para desfazer exclusão
+  final Command1<void, Failure, TransactionEntity>?
+  undoDelete; // Callback para desfazer exclusão 
   final BuildContext
   scaffoldContext; // Contexto do Scaffold para exibir SnackBars
   final bool isExpanded; // Se deve expandir para ocupar a altura restante
@@ -24,8 +25,8 @@ class TransactionCardSheets extends StatefulWidget {
     super.key,
     required this.incomeTransactions,
     required this.expenseTransactions,
-    required this.onDelete,
-    required this.undoDelete,
+    this.onDelete,
+    this.undoDelete,
     required this.scaffoldContext,
     this.isExpanded = false,
   });
@@ -37,17 +38,16 @@ class TransactionCardSheets extends StatefulWidget {
 class _TransactionCardSheetsState extends State<TransactionCardSheets>
     with SingleTickerProviderStateMixin {
   late TabController _tabController; // Controlador para o TabBar e TabBarView
+  final ScrollController _incomeScrollController = ScrollController(); // Controlador de scroll para receitas
+  final ScrollController _expenseScrollController = ScrollController(); // Controlador de scroll para despesas
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(
-      length: 2,
-      vsync: this,
-    ); // 2 abas: Receitas e Despesas
+    _tabController = TabController(length: 2, vsync: this);
     _tabController.addListener(() {
       if (mounted) {
-        setState(() {}); // Atualiza o estado quando troca de aba acontece
+        setState(() {}); 
       }
     });
   }
@@ -55,6 +55,8 @@ class _TransactionCardSheetsState extends State<TransactionCardSheets>
   @override
   void dispose() {
     _tabController.dispose(); // Limpa o controlador para evitar leaks
+    _incomeScrollController.dispose();
+    _expenseScrollController.dispose();
     super.dispose();
   }
 
@@ -221,9 +223,15 @@ class _TransactionCardSheetsState extends State<TransactionCardSheets>
       );
     }
 
+    final scrollController = title == TransactionType.income.namePlural
+        ? _incomeScrollController
+        : _expenseScrollController;
+
     return Scrollbar(
+      controller: scrollController,
       thumbVisibility: true, // Mostra a barra de rolagem sempre
       child: ListView.builder(
+        controller: scrollController,
         padding: const EdgeInsets.symmetric(
           vertical: 8,
         ), // Espaçamento vertical na lista
@@ -232,6 +240,54 @@ class _TransactionCardSheetsState extends State<TransactionCardSheets>
           final transaction = transactions[index];
           final undoTransaction =
               transaction.copyWith(); // Cópia para desfazer exclusão
+
+          final cardContent = Card(
+            margin: const EdgeInsets.symmetric(
+              horizontal: 5,
+              vertical: 4,
+            ), // Margem do card da transação
+            elevation: 0, // Sem sombra
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12), // Bordas arredondadas
+              side: BorderSide(
+                color: Colors.grey.shade300,
+              ), // Borda cinza clara
+            ),
+            child: ListTile(
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 8,
+              ), // Espaçamento interno do item
+              leading: CircleAvatar(
+                radius: 22,
+                child: Icon(
+                  transaction.category.icon, 
+                ),
+              ),
+              title: Text(
+                transaction.title,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              subtitle: Text(
+                '${Formatter.formatDate(transaction.date)} • ${transaction.category.displayName}',
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+              trailing: Text(
+                Formatter.formatCurrency(
+                  transaction.amount,
+                ), // Valor formatado em moeda
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: color, // Cor do texto conforme tipo
+                ),
+              ),
+            ),
+          );
+
+          // Se a função de deletar não for fornecida, exibe apenas o card sem Dismissible
+          if (widget.onDelete == null) {
+            return cardContent;
+          }
 
           return Dismissible(
             key: Key(transaction.id), // Chave única para controle do widget
@@ -255,12 +311,24 @@ class _TransactionCardSheetsState extends State<TransactionCardSheets>
             ),
             onDismissed: (direction) async {
               
-              await widget.onDelete(
+              await widget.onDelete!(
                 transaction.id,
               ); // Chama callback para deletar transação
 
               ScaffoldMessenger.of(widget.scaffoldContext).clearSnackBars();
               // Limpa snackbars anteriores para evitar sobreposição
+
+              if (widget.undoDelete == null) {
+                ScaffoldMessenger.of(widget.scaffoldContext).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      '${transaction.title} excluída!',
+                    ),
+                    backgroundColor: Colors.pinkAccent,
+                  ),
+                );
+                return;
+              }
 
               ScaffoldMessenger.of(widget.scaffoldContext).showSnackBar(
                 SnackBar(
@@ -274,9 +342,8 @@ class _TransactionCardSheetsState extends State<TransactionCardSheets>
                     textColor: Colors.white,
                     onPressed: () async {
                       // Chama callback para desfazer exclusão
-                      await widget.undoDelete.execute(undoTransaction);
-                      //print(widget.undoDelete.resultSignal.value);
-                      if (widget.undoDelete.resultSignal.value?.isSuccess ??
+                      await widget.undoDelete!.execute(undoTransaction);
+                      if (widget.undoDelete!.resultSignal.value?.isSuccess ??
                           false) {
                         ScaffoldMessenger.of(
                           widget.scaffoldContext,
@@ -295,10 +362,10 @@ class _TransactionCardSheetsState extends State<TransactionCardSheets>
                         ).showSnackBar(
                           SnackBar(
                             content: Text(
-                              '${widget.undoDelete.resultSignal.value?.failureValueOrNull ?? 'Erro desconhecido'}',
-                            ), // Mensagem de restauração
+                              '${widget.undoDelete!.resultSignal.value?.failureValueOrNull ?? 'Erro desconhecido'}',
+                            ), // Mensagem de erro ao restaurar
                             backgroundColor:
-                                Colors.red, // Cor do snackbar verde
+                                Colors.red, // Cor do snackbar vermelho
                           ),
                         );
                       }
@@ -307,52 +374,7 @@ class _TransactionCardSheetsState extends State<TransactionCardSheets>
                 ),
               );
             },
-            child: Card(
-              margin: const EdgeInsets.symmetric(
-                horizontal: 5,
-                vertical: 4,
-              ), // Margem do card da transação
-              elevation: 0, // Sem sombra
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12), // Bordas arredondadas
-                side: BorderSide(
-                  color: Colors.grey.shade300,
-                ), // Borda cinza clara
-              ),
-              child: ListTile(
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ), // Espaçamento interno do item
-                leading: CircleAvatar(
-                  radius: 22,
-                  backgroundColor: color.withValues(
-                    alpha: 0.2,
-                  ), // Fundo com transparência
-                  child: Icon(
-                    title == 'Income' ? Icons.attach_money : Icons.shopping_bag,
-                    color: color, // Cor do ícone conforme tipo
-                  ),
-                ),
-                title: Text(
-                  transaction.title, // Título da transação
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                subtitle: Text(
-                  Formatter.formatDate(transaction.date), // Data formatada
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-                trailing: Text(
-                  Formatter.formatCurrency(
-                    transaction.amount,
-                  ), // Valor formatado em moeda
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: color, // Cor do texto conforme tipo
-                  ),
-                ),
-              ),
-            ),
+            child: cardContent,
           );
         },
       ),
