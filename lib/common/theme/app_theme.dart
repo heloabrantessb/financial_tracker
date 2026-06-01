@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class AppColors {
   static const Color primary = Color(0xFF1E3A8A); // Premium Navy Blue (Azul Marinho)
-  static const Color secondary = Color(0xFF2563EB); // Solid Royal Blue (Azul Royal)
+  static const Color secondary = Color(0xFFEF4444); // Modern Vibrant Red (Vermelho para Despesas)
   static const Color backgroundLight = Color(0xFFF8FAFC); // Slate 50
   static const Color backgroundDark = Color(0xFF0F172A); // Slate 900
 }
