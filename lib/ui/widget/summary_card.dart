@@ -22,20 +22,19 @@ class SummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
 
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      margin: const EdgeInsets.all(16),
+      margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
           gradient: LinearGradient(
             colors: [
-              colorScheme.primary.withValues(alpha: 0.7),
-              colorScheme.secondary,
+              const Color(0xFF0A192F), // Azul marinho escuro profundo
+              const Color(0xFF1E3A8A), // Azul Marinho Premium (marca)
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -47,9 +46,10 @@ class SummaryCard extends StatelessWidget {
             // Card header
             Text(
               'Resumo Financeiro',
-              style: theme.textTheme.titleLarge?.copyWith(
-                color: colorScheme.onSecondary,
+              style: theme.textTheme.titleMedium?.copyWith(
+                color: Colors.white,
                 fontWeight: FontWeight.bold,
+                letterSpacing: 0.5,
               ),
             ),
             const SizedBox(height: 20),
@@ -58,29 +58,29 @@ class SummaryCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                // Income
+                // Income (Receita - Green)
                 _buildSummaryItem(
                   context,
                   'Receita',
                   Formatter.formatCurrency(totalIncome),
                   Icons.arrow_upward,
-                  colorScheme.secondary,
+                  const Color(0xFF4CAF50), // Modern Green
                 ),
-                // Expense
+                // Expense (Despesa - Red)
                 _buildSummaryItem(
                   context,
                   'Despesa',
                   Formatter.formatCurrency(totalExpense),
                   Icons.arrow_downward,
-                  colorScheme.tertiary,
+                  const Color(0xFFEF5350), // Modern Red
                 ),
-                // Balance
+                // Balance (Balanço - Wallet)
                 _buildSummaryItem(
                   context,
-                  'Balanço',
+                  'Saldo',
                   Formatter.formatCurrency(balance),
                   Icons.account_balance_wallet,
-                  balance >= 0 ? Colors.green : Colors.red,
+                  balance >= 0 ? const Color(0xFF4CAF50) : const Color(0xFFEF5350),
                 ),
               ],
             ),
@@ -90,7 +90,6 @@ class SummaryCard extends StatelessWidget {
     );
   }
 
-  /// Helper method to build individual summary items
   Widget _buildSummaryItem(
     BuildContext context,
     String title,
@@ -99,24 +98,24 @@ class SummaryCard extends StatelessWidget {
     Color color,
   ) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
     return Column(
       children: [
         // Icon with background
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: colorScheme.onSecondary.withValues(alpha: 0.45),
+            color: Colors.white.withValues(alpha: 0.15),
             shape: BoxShape.circle,
           ),
-          child: Icon(icon, color: color),
+          child: Icon(icon, color: color, size: 20),
         ),
         const SizedBox(height: 8),
         // Title
         Text(
           title,
           style: theme.textTheme.bodyMedium?.copyWith(
-            color: colorScheme.onSecondary.withValues(alpha: 0.95),
+            color: Colors.white.withValues(alpha: 0.7),
+            fontSize: 13,
           ),
         ),
         const SizedBox(height: 4),
@@ -125,7 +124,8 @@ class SummaryCard extends StatelessWidget {
           amount,
           style: theme.textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.bold,
-            color: colorScheme.onSecondary,
+            color: Colors.white,
+            fontSize: 15,
           ),
         ),
       ],

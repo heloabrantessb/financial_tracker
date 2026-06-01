@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
-class FranceColors {
-  static const Color blue = Color(0xFF0055A4);
-  static const Color white = Color(0xFFFFFFFF);
-  static const Color red = Color(0xFFEF4135);
+class AppColors {
+  static const Color primary = Color(0xFF1E3A8A); // Premium Navy Blue (Azul Marinho)
+  static const Color secondary = Color(0xFF2563EB); // Solid Royal Blue (Azul Royal)
+  static const Color backgroundLight = Color(0xFFF8FAFC); // Slate 50
+  static const Color backgroundDark = Color(0xFF0F172A); // Slate 900
 }
 
 // Light Theme
@@ -17,9 +18,10 @@ ThemeData _buildTheme(Brightness brightness) {
   final bool isDark = brightness == Brightness.dark;
 
   final ColorScheme colorScheme = ColorScheme.fromSeed(
-    seedColor: FranceColors.blue,
+    seedColor: AppColors.primary,
     brightness: brightness,
-    secondary: FranceColors.red,
+    secondary: AppColors.secondary,
+    surface: isDark ? AppColors.backgroundDark : AppColors.backgroundLight,
   );
 
   return ThemeData(
@@ -28,13 +30,18 @@ ThemeData _buildTheme(Brightness brightness) {
     colorScheme: colorScheme,
     scaffoldBackgroundColor: colorScheme.surface,
     appBarTheme: AppBarTheme(
-      backgroundColor: FranceColors.blue,
-      foregroundColor: FranceColors.white,
+      backgroundColor: colorScheme.primary,
+      foregroundColor: Colors.white,
+      elevation: 0,
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        backgroundColor: FranceColors.red,
-        foregroundColor: FranceColors.white,
+        backgroundColor: colorScheme.secondary,
+        foregroundColor: Colors.white,
+        elevation: 1,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
       ),
     ),
     textTheme: TextTheme(
@@ -47,8 +54,3 @@ ThemeData _buildTheme(Brightness brightness) {
     ),
   );
 }
-
-
-// ThemeData appTheme([bool isDarkMode=false]) {
-//   return isDarkMode ? franceDarkTheme : franceLightTheme;
-// }
